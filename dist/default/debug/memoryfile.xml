@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <executable name="dist/default/debug\26k83_can_ricsi.X.debug.hex">
+    <memory name="program">
+      <units>bytes</units>
+      <length>65536</length>
+      <used>227</used>
+      <free>65309</free>
+    </memory>
+    <memory name="data">
+      <units>bytes</units>
+      <length>4096</length>
+      <used>15</used>
+      <free>4081</free>
+    </memory>
+  </executable>
+</project>
