@@ -1,11 +1,11 @@
-Microchip MPLAB XC8 Compiler V2.32
+Microchip MPLAB XC8 Compiler V2.30
 
 Linker command line:
 
--W-3 --edf=C:\Program Files\Microchip\xc8\v2.32\pic\dat\en_msgs.txt -cn \
+-W-3 --edf=C:\Program Files\Microchip\xc8\v2.30\pic\dat\en_msgs.txt -cn \
   -h+dist/default/debug\26k83_can_ricsi.X.debug.sym \
   --cmf=dist/default/debug\26k83_can_ricsi.X.debug.cmf -z -Q18F26K83 \
-  -oC:\Users\nemet\AppData\Local\Temp\xcAsemg.4 --defsym=__MPLAB_BUILD=1 \
+  -oC:\Users\nemet\AppData\Local\Temp\sf18x2 --defsym=__MPLAB_BUILD=1 \
   -Mdist/default/debug/26k83_can_ricsi.X.debug.map -E1 -ver=XC8 Compiler \
   --acfsm=1493 -ASTACK=060h-0FFFh -pstack=STACK -ACODE=00h-0FFFFh \
   -ACONST=00h-0FFFFh -ASMALLCONST=01000h-010FFhx240 \
@@ -25,7 +25,7 @@ Linker command line:
   -pfarbss=FARRAM,fardata=FARRAM,nvFARRAM=FARRAM \
   -pintsave_regs=BIGRAM,bigbss=BIGRAM,bigdata=BIGRAM -pbss=RAM \
   -pidata=CODE,irdata=CODE,ibigdata=CODE,ifardata=CODE -prparam=COMRAM \
-  C:\Users\nemet\AppData\Local\Temp\xcAsemg.o \
+  C:\Users\nemet\AppData\Local\Temp\sf18x8.o \
   dist/default/debug\26k83_can_ricsi.X.debug.o 
 
 Object code version is 3.11
@@ -35,7 +35,7 @@ Machine type is 18F26K83
 
 
                 Name                               Link     Load   Length Selector   Space Scale
-C:\Users\nemet\AppData\Local\Temp\xcAsemg.o
+C:\Users\nemet\AppData\Local\Temp\sf18x8.o
                 idloc                            200000   200000       10        0       5
                 config                           300000   300000        A        0       4
                 init                               FFFC     FFFC        4     7FFE       0
@@ -43,12 +43,12 @@ C:\Users\nemet\AppData\Local\Temp\xcAsemg.o
 dist/default/debug\26k83_can_ricsi.X.debug.o
                 idloc                            200000   200000       10        0       5
                 config                           300000   300000        A        0       4
-                text0                              FF48     FF48       B4     7FA4       0
-                cstackCOMRAM                          F        F        1        1       1
-                dataCOMRAM                            E        E        1        1       1
+                text0                              FE86     FE86      176     7F43       0
+                cstackCOMRAM                          E        E        2        1       1
+                dataCOMRAM                           10       10        1        1       1
                 bssCOMRAM                             1        1        D        1       1
-                cinit                              FF22     FF22       26     7F91       0
-                idataCOMRAM                        FF21     FF21        1     FF21       0
+                cinit                              FE60     FE60       26     7F30       0
+                idataCOMRAM                        FE5F     FE5F        1     FE5F       0
 
 TOTAL           Name                               Link     Load   Length     Space
         CLASS   STACK          
@@ -56,9 +56,9 @@ TOTAL           Name                               Link     Load   Length     Sp
         CLASS   CODE           
                 init                               FFFC     FFFC        4         0
                 reset_vec                             0        0        4         0
-                text0                              FF48     FF48       B4         0
-                cinit                              FF22     FF22       26         0
-                idataCOMRAM                        FF21     FF21        1         0
+                text0                              FE86     FE86      176         0
+                cinit                              FE60     FE60       26         0
+                idataCOMRAM                        FE5F     FE5F        1         0
 
         CLASS   CONST          
 
@@ -67,8 +67,8 @@ TOTAL           Name                               Link     Load   Length     Sp
         CLASS   MEDIUMCONST    
 
         CLASS   COMRAM         
-                cstackCOMRAM                          F        F        1         1
-                dataCOMRAM                            E        E        1         1
+                cstackCOMRAM                          E        E        2         1
+                dataCOMRAM                           10       10        1         1
                 bssCOMRAM                             1        1        D         1
 
         CLASS   ABS1           
@@ -126,10 +126,10 @@ TOTAL           Name                               Link     Load   Length     Sp
 SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class
 
                 reset_vec                      000000  000004  000004         0       0  CODE    
-                bssCOMRAM                      000001  00000F  000010         1       1  COMRAM  
-                idataCOMRAM                    00FF21  000001  00FF22      FF21       0  CODE    
-                cinit                          00FF22  000026  00FF48      7F91       0  CODE    
-                text0                          00FF48  0000B4  00FFFC      7FA4       0  CODE    
+                bssCOMRAM                      000001  000010  000011         1       1  COMRAM  
+                idataCOMRAM                    00FE5F  000001  00FE60      FE5F       0  CODE    
+                cinit                          00FE60  000026  00FE86      7F30       0  CODE    
+                text0                          00FE86  000176  00FFFC      7F43       0  CODE    
                 init                           00FFFC  000004  010000      7FFE       0  CODE    
 
 
@@ -152,15 +152,15 @@ UNUSED ADDRESS RANGES
         BANK7            000700-0007FF              100
         BANK8            000800-0008FF              100
         BANK9            000900-0009FF              100
-        BIGRAM           000010-000FFF              FF0
-        CODE             000004-00FF20             FF1D
-        COMRAM           000010-00005F               50
-        CONST            000004-00FF20             FF1D
+        BIGRAM           000011-000FFF              FEF
+        CODE             000004-00FE5E             FE5B
+        COMRAM           000011-00005F               4F
+        CONST            000004-00FE5E             FE5B
         EEDATA           310000-3103FF              400
-        MEDIUMCONST      001000-00FF20             EF21
+        MEDIUMCONST      001000-00FE5E             EE5F
         RAM              000060-000FFF              100
         SFR              003700-003FFF              100
-        SMALLCONST       001000-00FF20              100
+        SMALLCONST       001000-00FE5E              100
         STACK            000060-000FFF              FA0
 
                                   Symbol Table
@@ -170,19 +170,51 @@ _ANSELCbits              (abs)        003A60
 _BRGCON1                 (abs)        003703
 _BRGCON2                 (abs)        003704
 _BRGCON3                 (abs)        003705
+_CANCON                  (abs)        003F8F
 _CANCONbits              (abs)        003F8F
 _CANRXPPS                (abs)        003AED
 _CANSTAT                 (abs)        003F8E
-_CANSTATbits             (abs)        003F8E
+_CIOCON                  (abs)        003700
 _CIOCONbits              (abs)        003700
+_ECANCON                 (abs)        003F91
 _ECANCONbits             (abs)        003F91
 _LATCbits                (abs)        003FBC
-_PIE5bits                (abs)        003995
 _RB2PPS                  (abs)        003A0A
 _RC4PPS                  (abs)        003A14
 _RXB0CONbits             (abs)        003F80
-_RXB0SIDH                (abs)        003F81
-_RXB0SIDL                (abs)        003F82
+_RXB1CONbits             (abs)        0037F0
+_RXF0EIDH                (abs)        0037A2
+_RXF0EIDL                (abs)        0037A3
+_RXF0SIDH                (abs)        0037A0
+_RXF0SIDL                (abs)        0037A1
+_RXF1EIDH                (abs)        0037A6
+_RXF1EIDL                (abs)        0037A7
+_RXF1SIDH                (abs)        0037A4
+_RXF1SIDL                (abs)        0037A5
+_RXF2EIDH                (abs)        0037AA
+_RXF2EIDL                (abs)        0037AB
+_RXF2SIDH                (abs)        0037A8
+_RXF2SIDL                (abs)        0037A9
+_RXF3EIDH                (abs)        0037AE
+_RXF3EIDL                (abs)        0037AF
+_RXF3SIDH                (abs)        0037AC
+_RXF3SIDL                (abs)        0037AD
+_RXF4EIDH                (abs)        0037B2
+_RXF4EIDL                (abs)        0037B3
+_RXF4SIDH                (abs)        0037B0
+_RXF4SIDL                (abs)        0037B1
+_RXF5EIDH                (abs)        0037B6
+_RXF5EIDL                (abs)        0037B7
+_RXF5SIDH                (abs)        0037B4
+_RXF5SIDL                (abs)        0037B5
+_RXM0EIDH                (abs)        0037BA
+_RXM0EIDL                (abs)        0037BB
+_RXM0SIDH                (abs)        0037B8
+_RXM0SIDL                (abs)        0037B9
+_RXM1EIDH                (abs)        0037BE
+_RXM1EIDL                (abs)        0037BF
+_RXM1SIDH                (abs)        0037BC
+_RXM1SIDL                (abs)        0037BD
 _TRISBbits               (abs)        003FC3
 _TRISCbits               (abs)        003FC4
 _TXB0CONbits             (abs)        0037E0
@@ -190,6 +222,10 @@ _TXB0D0                  (abs)        0037E6
 _TXB0D1                  (abs)        0037E7
 _TXB0D2                  (abs)        0037E8
 _TXB0DLC                 (abs)        0037E5
+_TXB0EIDH                (abs)        0037E3
+_TXB0EIDL                (abs)        0037E4
+_TXB0SIDH                (abs)        0037E1
+_TXB0SIDL                (abs)        0037E2
 __HRAM                   (abs)        000000
 __Habs1                  abs1         000000
 __Hbank0                 bank0        000000
@@ -248,7 +284,7 @@ __Hrparam                rparam       000000
 __Hsfr                   sfr          000000
 __Hsmallconst            smallconst   000000
 __Hspace_0               (abs)        010000
-__Hspace_1               (abs)        000010
+__Hspace_1               (abs)        000011
 __Hspace_2               (abs)        000000
 __Hspace_4               (abs)        60000A
 __Hstack                 stack        000000
@@ -323,7 +359,7 @@ __Ltemp                  temp         000000
 __Ltext                  text         000000
 __Ltext0                 text0        000000
 __S0                     (abs)        010000
-__S1                     (abs)        000010
+__S1                     (abs)        000011
 __S2                     (abs)        000000
 __S4                     (abs)        000000
 __S5                     (abs)        000000
@@ -334,16 +370,16 @@ ___rparam_used           (abs)        000001
 ___sp                    stack        000000
 __accesstop              (abs)        000060
 __activetblptr           (abs)        000000
-__end_of__initialization cinit        00FF42
+__end_of__initialization cinit        00FE80
 __end_of_main            text0        00FFFC
-__initialization         cinit        00FF22
+__initialization         cinit        00FE60
 __mediumconst            mediumconst  000000
 __pbssCOMRAM             bssCOMRAM    000001
-__pcinit                 cinit        00FF22
-__pcstackCOMRAM          cstackCOMRAM 00000F
-__pdataCOMRAM            dataCOMRAM   00000E
-__pidataCOMRAM           idataCOMRAM  00FF21
-__ptext0                 text0        00FF48
+__pcinit                 cinit        00FE60
+__pcstackCOMRAM          cstackCOMRAM 00000E
+__pdataCOMRAM            dataCOMRAM   000010
+__pidataCOMRAM           idataCOMRAM  00FE5F
+__ptext0                 text0        00FE86
 __ramtop                 ramtop       001000
 __size_of_main           (abs)        000000
 __smallconst             smallconst   000000
@@ -356,35 +392,64 @@ _can_ilen                bssCOMRAM    000007
 _can_irxadd              bssCOMRAM    000005
 _can_itxadd              bssCOMRAM    000006
 _lst_add                 bssCOMRAM    00000D
-_main                    text0        00FF48
-_own_add                 dataCOMRAM   00000E
+_main                    text0        00FE86
+_own_add                 dataCOMRAM   000010
 _rcl_add                 bssCOMRAM    00000C
 _t_cnt                   bssCOMRAM    000003
 _tbl_add                 bssCOMRAM    000002
 _tbl_dat                 bssCOMRAM    000001
-end_of_initialization    cinit        00FF42
+end_of_initialization    cinit        00FE80
 intlevel0                text         000000
 intlevel1                text         000000
 intlevel2                text         000000
 intlevel3                text         000000
-isa$std                  (abs)        000001
-isa$xinst                (abs)        000000
 stackhi                  (abs)        000FFF
 stacklo                  (abs)        000060
 start                    init         00FFFC
-start_initialization     cinit        00FF22
+start_initialization     cinit        00FE60
+
+
+FUNCTION INFORMATION:
+
+ *************** function _main *****************
+ Defined at:
+		line 88 in file "newmain.c"
+ Parameters:    Size  Location     Type
+		None
+ Auto vars:     Size  Location     Type
+		None
+ Return value:  Size  Location     Type
+                  1    wreg      void 
+ Registers used:
+		wreg, status,2, status,0
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMRAM   BANK0   BANK1   BANK2   BANK3   BANK4   BANK5   BANK6   BANK7   BANK8   BANK9  BANK10  BANK11  BANK12  BANK13  BANK14  BANK15
+      Params:         0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0
+      Locals:         0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0
+      Temps:          2       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0
+      Totals:         2       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0       0
+Total ram usage:        2 bytes
+ This function calls:
+		Nothing
+ This function is called by:
+		Startup code after reset
+ This function uses a non-reentrant model
+
 
 
 MODULE INFORMATION
 
 Module		Function		Class		Link	Load	Size
 newmain.c
-		_main          		CODE           	FF48	0000	180
+		_main          		CODE           	FE86	0000	374
 
-newmain.c estimated size: 180
+newmain.c estimated size: 374
 
 shared
-		__initialization		CODE           	FF22	0000	32
+		__initialization		CODE           	FE60	0000	32
 
 shared estimated size: 32
 

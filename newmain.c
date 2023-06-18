@@ -11,7 +11,7 @@
 
 // CONFIG1L
 #pragma config FEXTOSC = HS     // External Oscillator Selection (HS (crystal oscillator) above 8 MHz; PFM set to high power)
-#pragma config RSTOSC = HFINTOSC_64MHZ// Reset Oscillator Selection (EXTOSC with 4x PLL, with EXTOSC operating per FEXTOSC bits)
+#pragma config RSTOSC = EXTOSC// Reset Oscillator Selection (EXTOSC with 4x PLL, with EXTOSC operating per FEXTOSC bits)
 
 // CONFIG1H
 #pragma config CLKOUTEN = OFF   // Clock out Enable bit (CLKOUT function is disabled)
@@ -64,8 +64,11 @@
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 
+
 #include <xc.h>
-#define _XTAL_FREQ 64000000
+
+
+#define _XTAL_FREQ 20000000
 char own_add = 10;
  char own_add;
  char lst_add;
@@ -85,15 +88,18 @@ char own_add = 10;
 void main(void) {
     
     TRISCbits.TRISC3 = 0;
+    TRISCbits.TRISC0 = 0;
     TRISBbits.TRISB3 = 1;
     TRISBbits.TRISB2 = 0;
     TRISCbits.TRISC4 = 0;
-    RB2PPS = 0b110100;   //RB2->ECAN:CANTX1;  
-    RC4PPS = 0b110011;   //Rc4->ECAN:CANTX0;
+    RB2PPS = 0b110011;   //RB2->ECAN:CANTX1;  
+    RC4PPS = 0b110100;   //Rc4->ECAN:CANTX0;
     CANRXPPS = 0x0B;   //RB3->ECAN:CANRX;  
     ANSELBbits.ANSELB2 = 0;
     ANSELBbits.ANSELB3 = 0;
     ANSELCbits.ANSELC4 = 0;
+ 
+
     __delay_ms(2000);
     CANCON = 0x80;
     while (0x80 != (CANSTAT & 0xE0)); // wait until ECAN is in config mode
@@ -143,61 +149,44 @@ void main(void) {
     BRGCON1 = 0x3F;
     BRGCON2 = 0xF1;
     BRGCON3 = 0x05;
-    CIOCONbits.CLKSEL = 1;
-    CIOCONbits.TX1SRC = 1;
+    CIOCONbits.CLKSEL = 0;
     ECANCONbits.MDSEL = 0b00;
     CANCON = 0x00;
     while (0x00 != (CANSTAT & 0xE0)); // wait until ECAN is in Normal mode
 
     CANCONbits.REQOP = 0;
     while (0x00 != (CANSTAT & 0xE0)); // wait until ECAN is in Normal mode
+    CANCON = 0b00001000;
     
     if (TXB0CONbits.TXREQ != 1) 
     {
-
+        TXB0EIDH = 0x00;
+    TXB0EIDL = 0x00;
+    
+    //0x35E    0110 1011 110
+    TXB0SIDH = 0x0;
+    TXB0SIDL = 0x0;
         TXB0DLC  = 3;
         TXB0D0   = 2;
         TXB0D1   = 0;
         TXB0D2   = 1;
+        
 
         TXB0CONbits.TXREQ = 1; //Set the buffer to transmit		
         
     } 
     while(1)
     {
-        LATCbits.LATC3 ^= 1;
+        if (RXB0CONbits.RXFUL != 0) //CheckRXB0
+    {
+       
+    }
+    if (RXB1CONbits.RXFUL != 0) //CheckRXB1
+    {
+        
+    }
+        LATCbits.LATC0 ^= 1; 
         __delay_ms(10);
     }
     return;
 }
-//void __interrupt() myISR(void)
-//{
-//// *** CAN ***
-//	if (PIR5bits.RXB0IF && PIE5bits.RXB0IE)		// CAN controller interrupt
-//		{
-//		PIR5bits.RXB0IF = 0;
-//		COMSTAT = 0;
-//
-//
-//		can_itxadd	= RXB0D0;		// read data
-//		can_irxadd	= RXB0D1;		// read data
-//		can_idat	= RXB0D2;		// read data
-//		can_iedat	= RXB0D3;		// read data
-//		can_ilen	= RXB0DLC & 0x07;
-////		RXB0FUL = 0;
-//
-//		if (can_ilen == 2)
-//			{
-//
-//			}
-//		if (can_ilen == 3)
-//			{
-//
-//			}
-//		if (can_ilen == 4)
-//			{
-//			}
-//
-//		CANCON	= 0;
-//		}
-//}
