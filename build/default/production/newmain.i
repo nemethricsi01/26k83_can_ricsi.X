@@ -7,7 +7,7 @@
 # 1 "C:/Users/nemet/.mchp_packs/Microchip/PIC18F-K_DFP/1.6.125/xc8\\pic\\include\\language_support.h" 1 3
 # 2 "<built-in>" 2
 # 1 "newmain.c" 2
-# 13 "newmain.c"
+# 14 "newmain.c"
 #pragma config FEXTOSC = HS
 #pragma config RSTOSC = HFINTOSC_64MHZ
 
@@ -36453,45 +36453,32 @@ __attribute__((__unsupported__("The READTIMER" "3" "() macro is not available wi
 unsigned char __t1rd16on(void);
 unsigned char __t3rd16on(void);
 # 34 "C:/Users/nemet/.mchp_packs/Microchip/PIC18F-K_DFP/1.6.125/xc8\\pic\\include\\xc.h" 2 3
-# 67 "newmain.c" 2
+# 68 "newmain.c" 2
 
 
-char own_add = 10;
- char own_add;
- char lst_add;
- char rcl_add;
- char can_add;
- char can_dat;
- char can_idat;
- char can_iedat;
- char can_ilen;
- char can_itxadd;
- char can_irxadd;
- char call_add;
- char t_cnt;
- char tbl_add;
- char tbl_dat;
+struct CAN_RXBUFF
+   {
+    uint8_t idh;
+    uint8_t idl;
+    uint8_t dl;
+    uint8_t d0;
+    uint8_t d1;
+    uint8_t d2;
+    uint8_t d3;
+    uint8_t d4;
+   };
+struct CAN_RXBUFF can_rxbuff;
 
-void main(void) {
+void can_init(void)
+{
+    RB5PPS = 0b110011;
+    CANRXPPS = 0x0A;
 
-    TRISCbits.TRISC3 = 0;
-    TRISBbits.TRISB3 = 1;
-    TRISBbits.TRISB2 = 0;
-    TRISCbits.TRISC4 = 0;
-    RB2PPS = 0b110100;
-    RC4PPS = 0b110011;
-    CANRXPPS = 0x0B;
     ANSELBbits.ANSELB2 = 0;
-    ANSELBbits.ANSELB3 = 0;
-    ANSELCbits.ANSELC4 = 0;
-    _delay((unsigned long)((2000)*(64000000/4000.0)));
-    CANCON = 0x80;
+    ANSELBbits.ANSELB5 = 0;
+    CANCONbits.REQOP = 0b100;
     while (0x80 != (CANSTAT & 0xE0));
-
     ECANCON = 0x00;
-
-    CIOCON = 0x01;
-
     RXM0EIDH = 0x00;
     RXM0EIDL = 0x00;
     RXM0SIDH = 0x00;
@@ -36500,10 +36487,6 @@ void main(void) {
     RXM1EIDL = 0x00;
     RXM1SIDH = 0x00;
     RXM1SIDL = 0x00;
-
-
-
-
     RXF0EIDH = 0x00;
     RXF0EIDL = 0x00;
     RXF0SIDH = 0x00;
@@ -36512,40 +36495,123 @@ void main(void) {
     RXF1EIDL = 0x00;
     RXF1SIDH = 0x00;
     RXF1SIDL = 0x00;
-    RXF2EIDH = 0x00;
-    RXF2EIDL = 0x00;
-    RXF2SIDH = 0x00;
-    RXF2SIDL = 0x00;
-    RXF3EIDH = 0x00;
-    RXF3EIDL = 0x00;
-    RXF3SIDH = 0x00;
-    RXF3SIDL = 0x00;
-    RXF4EIDH = 0x00;
-    RXF4EIDL = 0x00;
-    RXF4SIDH = 0x00;
-    RXF4SIDL = 0x00;
-    RXF5EIDH = 0x00;
-    RXF5EIDL = 0x00;
-    RXF5SIDH = 0x00;
-    RXF5SIDL = 0x00;
-
-
     BRGCON1 = 0x3F;
     BRGCON2 = 0xF1;
     BRGCON3 = 0x05;
     CIOCONbits.CLKSEL = 1;
     CIOCONbits.TX1SRC = 1;
     ECANCONbits.MDSEL = 0b00;
-    CANCON = 0x00;
-    while (0x00 != (CANSTAT & 0xE0));
-
     CANCONbits.REQOP = 0;
     while (0x00 != (CANSTAT & 0xE0));
+}
+# 131 "newmain.c"
+void disp_write_command(uint8_t command)
+{
+    I2C1ADB1 = 0x78;
+    I2C1TXB = 0x0;
+    I2C1CNT = 2;
+    I2C1CON0bits.S = 1;
+    while(I2C1STAT1bits.TXBE != 0);
+    while(I2C1CON0bits.MDR != 1);
+    I2C1TXB = command;
+}
+void disp_write_data(uint8_t data)
+{
+    I2C1ADB1 = 0x78;
+    I2C1TXB = 0x40;
+    I2C1CNT = 2;
+    I2C1CON0bits.S = 1;
+    while(I2C1STAT1bits.TXBE != 0);
+    while(I2C1CON0bits.MDR != 1);
+    I2C1TXB = data;
+}
+void i2c_init(void)
+{
+    TRISCbits.TRISC3 = 0;
+    TRISCbits.TRISC2 = 0;
+    ANSELCbits.ANSELC2 = 0;
+    ANSELCbits.ANSELC3 = 0;
+    I2C1SDAPPS = 0b00010010;
+    I2C1SCLPPS = 0b00010011;
+    RC2PPS = 0b100010;
+    RC3PPS = 0b100001;
+    WPUCbits.WPUC2 = 1;
+    WPUCbits.WPUC3 = 1;
+    ODCONC = 0xc;
+
+    I2C1CON0bits.MODE = 0b100;
+    I2C1CLKbits.CLK = 0b0011;
+
+    I2C1CON0bits.EN = 1;
+}
+void main(void) {
+
+    TRISBbits.TRISB0 = 0;
+    TRISBbits.TRISB2 = 1;
+    TRISBbits.TRISB5 = 0;
+    TRISCbits.TRISC4 = 0;
+    TRISCbits.TRISC1 = 0;
+
+    ANSELCbits.ANSELC4 = 0;
+    _delay((unsigned long)((2000)*(64000000/4000.0)));
+    PIE5bits.RXB0IE = 1;
+    INTCON0bits.GIE = 1;
+    INTCON0bits.GIEH = 1;
+
+    can_init();
+    i2c_init();
+
+    LATCbits.LATC1 = 0;
+    _delay((unsigned long)((50)*(64000000/4000.0)));
+    LATCbits.LATC1 = 1;
+    _delay((unsigned long)((50)*(64000000/4000.0)));
+    LATCbits.LATC1 = 0;
+    _delay((unsigned long)((50)*(64000000/4000.0)));
+    LATCbits.LATC1 = 1;
+    _delay((unsigned long)((50)*(64000000/4000.0)));
+    disp_write_command(0b00111010);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00001001);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00000110);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00011110);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00111001);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00011011);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b01101110);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b01010111);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b01110010);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00111000);
+   _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_command(0b00001111);
+      _delay((unsigned long)((1)*(64000000/4000.0)));
+      disp_write_command(0b00000001);
+   _delay((unsigned long)((200)*(64000000/4000.0)));
+      disp_write_command(0b00000010);
+   _delay((unsigned long)((200)*(64000000/4000.0)));
+
+   disp_write_data('A');
+      _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_data('B');
+      _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_data('C');
+      _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_data('D');
+      _delay((unsigned long)((1)*(64000000/4000.0)));
+   disp_write_data('E');
+
 
     if (TXB0CONbits.TXREQ != 1)
     {
-
-        TXB0DLC = 3;
+        TXB0SIDL = 1;
+        TXB0SIDH = 0;
+        TXB0DLC = 5;
         TXB0D0 = 2;
         TXB0D1 = 0;
         TXB0D2 = 1;
@@ -36555,8 +36621,25 @@ void main(void) {
     }
     while(1)
     {
-        LATCbits.LATC3 ^= 1;
-        _delay((unsigned long)((10)*(64000000/4000.0)));
+        LATBbits.LATB0 ^= 1;
+        _delay((unsigned long)((1000)*(64000000/4000.0)));
     }
     return;
+}
+void __attribute__((picinterrupt(("")))) myISR(void)
+{
+
+ if (PIR5bits.RXB0IF && PIE5bits.RXB0IE)
+  {
+  PIR5bits.RXB0IF = 0;
+
+  can_rxbuff.d0 = RXB0D0;
+  can_rxbuff.d1 = RXB0D1;
+  can_rxbuff.d2 = RXB0D2;
+  can_rxbuff.d3 = RXB0D3;
+  can_rxbuff.dl = RXB0DLC;
+        can_rxbuff.idh = RXB0SIDH;
+        can_rxbuff.idl = RXB0SIDL;
+        RXB0CONbits.RXFUL = 0;
+  }
 }

@@ -175,7 +175,7 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
+        <property key="poweroptions.powerenable" value="false"/>
         <property key="programmerToGoImageName" value="26k83_can_ricsi_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>
@@ -257,7 +257,7 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="true"/>
+        <property key="poweroptions.powerenable" value="false"/>
         <property key="programmerToGoImageName" value="26k83_can_ricsi_ptg"/>
         <property key="programoptions.donoteraseauxmem" value="false"/>
         <property key="programoptions.eraseb4program" value="true"/>

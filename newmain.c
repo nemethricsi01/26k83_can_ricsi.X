@@ -5,13 +5,14 @@
  * Created on June 9, 2023, 1:17 PM
  */
 
+
 // PIC18F26K83 Configuration Bit Settings
 
 // 'C' source line config statements
 
 // CONFIG1L
 #pragma config FEXTOSC = HS     // External Oscillator Selection (HS (crystal oscillator) above 8 MHz; PFM set to high power)
-#pragma config RSTOSC = HFINTOSC_64MHZ// Reset Oscillator Selection (EXTOSC with 4x PLL, with EXTOSC operating per FEXTOSC bits)
+#pragma config RSTOSC = HFINTOSC_64MHZ// Reset Oscillator Selection (HFINTOSC with HFFRQ = 64 MHz and CDIV = 1:1)
 
 // CONFIG1H
 #pragma config CLKOUTEN = OFF   // Clock out Enable bit (CLKOUT function is disabled)
@@ -66,42 +67,29 @@
 
 #include <xc.h>
 #define _XTAL_FREQ 64000000
-char own_add = 10;
- char own_add;
- char lst_add;
- char rcl_add;
- char can_add;
- char can_dat;
- char can_idat;
- char can_iedat;
- char can_ilen;
- char can_itxadd;
- char can_irxadd;
- char call_add;
- char t_cnt;			// table counter
- char tbl_add;			// table address
- char tbl_dat;			// table data
+struct CAN_RXBUFF
+   {
+    uint8_t idh;
+    uint8_t idl;
+    uint8_t dl;
+    uint8_t d0;
+    uint8_t d1;
+    uint8_t d2;
+    uint8_t d3;
+    uint8_t d4;
+   };
+struct CAN_RXBUFF can_rxbuff;
 
-void main(void) {
+void can_init(void)
+{
+    RB5PPS = 0b110011;//RB5->ECAN:CANTX1;  
+    CANRXPPS = 0x0A;   //RB2->ECAN:CANRX;  
     
-    TRISCbits.TRISC3 = 0;
-    TRISBbits.TRISB3 = 1;
-    TRISBbits.TRISB2 = 0;
-    TRISCbits.TRISC4 = 0;
-    RB2PPS = 0b110100;   //RB2->ECAN:CANTX1;  
-    RC4PPS = 0b110011;   //Rc4->ECAN:CANTX0;
-    CANRXPPS = 0x0B;   //RB3->ECAN:CANRX;  
     ANSELBbits.ANSELB2 = 0;
-    ANSELBbits.ANSELB3 = 0;
-    ANSELCbits.ANSELC4 = 0;
-    __delay_ms(2000);
-    CANCON = 0x80;
+    ANSELBbits.ANSELB5 = 0;
+    CANCONbits.REQOP = 0b100;//request config mode
     while (0x80 != (CANSTAT & 0xE0)); // wait until ECAN is in config mode
-    
     ECANCON = 0x00;
-
-    CIOCON = 0x01;
-
     RXM0EIDH = 0x00;
     RXM0EIDL = 0x00;
     RXM0SIDH = 0x00;
@@ -109,11 +97,7 @@ void main(void) {
     RXM1EIDH = 0x00;
     RXM1EIDL = 0x00;
     RXM1SIDH = 0x00;
-    RXM1SIDL = 0x00;
- 
-    /**
-    Initialize Receive Filters
-    */   
+    RXM1SIDL = 0x00;  
     RXF0EIDH = 0x00;
     RXF0EIDL = 0x00;
     RXF0SIDH = 0x00;
@@ -122,40 +106,135 @@ void main(void) {
     RXF1EIDL = 0x00;
     RXF1SIDH = 0x00;
     RXF1SIDL = 0x00;
-    RXF2EIDH = 0x00;
-    RXF2EIDL = 0x00;
-    RXF2SIDH = 0x00;
-    RXF2SIDL = 0x00;
-    RXF3EIDH = 0x00;
-    RXF3EIDL = 0x00;
-    RXF3SIDH = 0x00;
-    RXF3SIDL = 0x00;
-    RXF4EIDH = 0x00;
-    RXF4EIDL = 0x00;
-    RXF4SIDH = 0x00;
-    RXF4SIDL = 0x00;
-    RXF5EIDH = 0x00;
-    RXF5EIDL = 0x00;
-    RXF5SIDH = 0x00;
-    RXF5SIDL = 0x00;
-
-
     BRGCON1 = 0x3F;
     BRGCON2 = 0xF1;
     BRGCON3 = 0x05;
     CIOCONbits.CLKSEL = 1;
     CIOCONbits.TX1SRC = 1;
     ECANCONbits.MDSEL = 0b00;
-    CANCON = 0x00;
+    CANCONbits.REQOP = 0;//request normal mode
     while (0x00 != (CANSTAT & 0xE0)); // wait until ECAN is in Normal mode
+}
+//void i2c_start(void){
+//    PIR1bits.SSPIF = 0;
+//    SSPCON2bits.SEN = 1;
+//    while(PIR1bits.SSPIF != 1);
+//    PIR1bits.SSPIF = 0;
+//}
+//void i2c_stop(void){
+//    PIR1bits.SSPIF = 0;
+//    SSPCON2bits.PEN = 1;
+//    while(PIR1bits.SSPIF != 1);
+//    PIR1bits.SSPIF = 0;
+//}
 
-    CANCONbits.REQOP = 0;
-    while (0x00 != (CANSTAT & 0xE0)); // wait until ECAN is in Normal mode
+void disp_write_command(uint8_t command)
+{
+    I2C1ADB1 = 0x78;                   // Load address with write = 0
+    I2C1TXB = 0x0;                 
+    I2C1CNT = 2;                       // Load with size of array to write
+    I2C1CON0bits.S = 1;
+    while(I2C1STAT1bits.TXBE != 0);
+    while(I2C1CON0bits.MDR != 1);
+    I2C1TXB = command;
+}
+void disp_write_data(uint8_t data)
+{
+    I2C1ADB1 = 0x78;                   // Load address with write = 0
+    I2C1TXB = 0x40;                 
+    I2C1CNT = 2;                       // Load with size of array to write
+    I2C1CON0bits.S = 1;
+    while(I2C1STAT1bits.TXBE != 0);
+    while(I2C1CON0bits.MDR != 1);
+    I2C1TXB = data;
+}
+void i2c_init(void)
+{
+    TRISCbits.TRISC3 = 0;//scl
+    TRISCbits.TRISC2 = 0;//sda
+    ANSELCbits.ANSELC2 = 0;
+    ANSELCbits.ANSELC3 = 0;
+    I2C1SDAPPS = 0b00010010;//C2
+    I2C1SCLPPS = 0b00010011;//C3
+    RC2PPS = 0b100010;//sda
+    RC3PPS = 0b100001;//scl
+    WPUCbits.WPUC2 = 1;
+    WPUCbits.WPUC3 = 1;
+    ODCONC = 0xc;//FONTOS
+    
+    I2C1CON0bits.MODE = 0b100;//master mode 7 bit address
+    I2C1CLKbits.CLK = 0b0011;//mfintosc
+//    I2C1CON2bits.ACNT = 1;
+    I2C1CON0bits.EN = 1;
+}
+void main(void) {
+
+    TRISBbits.TRISB0 = 0;
+    TRISBbits.TRISB2 = 1;
+    TRISBbits.TRISB5 = 0;
+    TRISCbits.TRISC4 = 0;
+    TRISCbits.TRISC1 = 0;
+
+    ANSELCbits.ANSELC4 = 0;
+    __delay_ms(2000);
+    PIE5bits.RXB0IE = 1;
+    INTCON0bits.GIE = 1;
+    INTCON0bits.GIEH = 1;
+    
+    can_init();
+    i2c_init();
+    
+    LATCbits.LATC1 = 0;
+    __delay_ms(50);
+    LATCbits.LATC1 = 1;
+    __delay_ms(50);
+    LATCbits.LATC1 = 0;
+    __delay_ms(50);
+    LATCbits.LATC1 = 1;
+    __delay_ms(50);
+    disp_write_command(0b00111010);//function set
+	  __delay_ms(1);
+	  disp_write_command(0b00001001);//extended function set
+	  __delay_ms(1);
+	  disp_write_command(0b00000110);//entry mode set
+	  __delay_ms(1);
+	  disp_write_command(0b00011110);//bias setting
+	  __delay_ms(1);
+	  disp_write_command(0b00111001);//function set
+	  __delay_ms(1);
+	  disp_write_command(0b00011011);//internal osc
+	  __delay_ms(1);
+	  disp_write_command(0b01101110);//follower control
+	  __delay_ms(1);
+	  disp_write_command(0b01010111);//power control
+	  __delay_ms(1);
+	  disp_write_command(0b01110010);//contrast set
+	  __delay_ms(1);
+	  disp_write_command(0b00111000);//function set
+	  __delay_ms(1);
+	  disp_write_command(0b00001111);//display on
+      __delay_ms(1);
+      disp_write_command(0b00000001);//display clr
+	  __delay_ms(200);
+      disp_write_command(0b00000010);//display home
+	  __delay_ms(200);
+      
+	  disp_write_data('A');
+      __delay_ms(1);
+	  disp_write_data('B');
+      __delay_ms(1);
+	  disp_write_data('C');
+      __delay_ms(1);
+	  disp_write_data('D');
+      __delay_ms(1);
+	  disp_write_data('E');
+    
     
     if (TXB0CONbits.TXREQ != 1) 
     {
-
-        TXB0DLC  = 3;
+        TXB0SIDL = 1;
+        TXB0SIDH = 0;
+        TXB0DLC  = 5;
         TXB0D0   = 2;
         TXB0D1   = 0;
         TXB0D2   = 1;
@@ -165,39 +244,25 @@ void main(void) {
     } 
     while(1)
     {
-        LATCbits.LATC3 ^= 1;
-        __delay_ms(10);
+        LATBbits.LATB0 ^= 1;
+        __delay_ms(1000);
     }
     return;
 }
-//void __interrupt() myISR(void)
-//{
-//// *** CAN ***
-//	if (PIR5bits.RXB0IF && PIE5bits.RXB0IE)		// CAN controller interrupt
-//		{
-//		PIR5bits.RXB0IF = 0;
-//		COMSTAT = 0;
-//
-//
-//		can_itxadd	= RXB0D0;		// read data
-//		can_irxadd	= RXB0D1;		// read data
-//		can_idat	= RXB0D2;		// read data
-//		can_iedat	= RXB0D3;		// read data
-//		can_ilen	= RXB0DLC & 0x07;
-////		RXB0FUL = 0;
-//
-//		if (can_ilen == 2)
-//			{
-//
-//			}
-//		if (can_ilen == 3)
-//			{
-//
-//			}
-//		if (can_ilen == 4)
-//			{
-//			}
-//
-//		CANCON	= 0;
-//		}
-//}
+void __interrupt() myISR(void)
+{
+// *** CAN ***
+	if (PIR5bits.RXB0IF && PIE5bits.RXB0IE)		// CAN controller interrupt
+		{
+		PIR5bits.RXB0IF = 0;
+
+		can_rxbuff.d0	= RXB0D0;		// read data
+		can_rxbuff.d1	= RXB0D1;		// read data
+		can_rxbuff.d2	= RXB0D2;		// read data
+		can_rxbuff.d3	= RXB0D3;		// read data
+		can_rxbuff.dl	= RXB0DLC;
+        can_rxbuff.idh  = RXB0SIDH;
+        can_rxbuff.idl  = RXB0SIDL;
+        RXB0CONbits.RXFUL = 0;
+		}
+}
