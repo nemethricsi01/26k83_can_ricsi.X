@@ -65,7 +65,6 @@
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
 
-
 #include <xc.h>
 #define _XTAL_FREQ 64000000
 struct CAN_RXBUFF
@@ -110,7 +109,8 @@ void can_init(void)
     BRGCON1 = 0x3F;
     BRGCON2 = 0xF1;
     BRGCON3 = 0x05;
-    CIOCONbits.CLKSEL = 0;
+    CIOCONbits.CLKSEL = 1;
+    CIOCONbits.TX1SRC = 1;
     ECANCONbits.MDSEL = 0b00;
     CANCONbits.REQOP = 0;//request normal mode
     while (0x00 != (CANSTAT & 0xE0)); // wait until ECAN is in Normal mode
@@ -238,7 +238,6 @@ void main(void) {
         TXB0D0   = 2;
         TXB0D1   = 0;
         TXB0D2   = 1;
-        
 
         TXB0CONbits.TXREQ = 1; //Set the buffer to transmit		
         
