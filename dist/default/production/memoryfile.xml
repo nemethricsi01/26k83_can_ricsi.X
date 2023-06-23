@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <executable name="dist/default/production\26k83_can_ricsi.X.production.hex">
@@ -15,3 +16,22 @@
     </memory>
   </executable>
 </project>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <executable name="dist/default/production\26k83_can_ricsi.X.production.hex">
+    <memory name="program">
+      <units>bytes</units>
+      <length>65536</length>
+      <used>421</used>
+      <free>65115</free>
+    </memory>
+    <memory name="data">
+      <units>bytes</units>
+      <length>4096</length>
+      <used>16</used>
+      <free>4080</free>
+    </memory>
+  </executable>
+</project>
+>>>>>>> master
